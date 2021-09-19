@@ -19,9 +19,10 @@ static Node* createNode(Node* nextNode, Node* prevNode, void* nodeVal){
 
 List* List_create(){
     // initialize header
-    pHeaderList->headNext = NULL;
+    pHeaderList->head = NULL;
     pHeaderList->len = 0;
     pHeaderList->currentNode = NULL;
+    pHeaderList->tail = NULL;
 
     List* newListPointer = pHeaderList;
     pHeaderList += 1;
@@ -36,7 +37,7 @@ void* List_first(List* pList){
     if (pList->len == 0) {
         return NULL;
     }
-    pList->currentNode = pList->headNext;
+    pList->currentNode = pList->head->nextNode;
     return pList->currentNode;
 }
 
@@ -44,12 +45,13 @@ void* List_last(List* pList){
     if (pList->len == 0) {
         return NULL;
     }
-    pList->currentNode = pList->pTail->prevNode;
+    pList->currentNode = pList->tail->prevNode;
     return pList->currentNode;
 }
 
 void* List_next(List* pList) {
-    if (pList->currentNode->nextNode->nodeVal == NULL){
+    if (pList->currentNode->nextNode == pList->tail){
+        pList->currentNode = pList->tail;
         return NULL;
     }
     pList->currentNode = pList->currentNode->nextNode;
@@ -57,9 +59,10 @@ void* List_next(List* pList) {
 }
 
 void* List_prev(List* pList){
-    // if (pList->currentNode->prevNode->nodeVal == NULL){
-    //     return NULL;
-    // }
+    if (pList->currentNode->prevNode == pList->head){
+        pList->currentNode = pList->head;
+        return NULL;
+    }
     pList->currentNode = pList->currentNode->prevNode;
     return pList->currentNode;
 }
@@ -72,20 +75,24 @@ int List_append(List* pList, void* pItem){
     Node* newNode;
     if (pList->len == 0) {
         newNode = createNode(NULL, NULL, pItem);
-        pList->headNext = newNode;
+
+        // initialize head
+        Node* head = createNode(newNode, NULL, NULL);
+        pList->head = head;
 
         // initialize tail
         Node* tail = createNode(NULL, newNode, NULL);
+        pList->tail = tail;
+
+        newNode->prevNode = head;
         newNode->nextNode = tail;
-        pList->pTail = tail;
     } else {
-        Node* lastNode = pList->pTail->prevNode;
-        newNode = createNode(pList->pTail, lastNode, pItem);
+        Node* lastNode = pList->tail->prevNode;
+        newNode = createNode(pList->tail, lastNode, pItem);
         lastNode->nextNode = newNode;
-        pList->pTail->prevNode = newNode;
+        pList->tail->prevNode = newNode;
     }
     pList->currentNode = newNode;
     pList->len++;
-    printf("Added %d to the list\n", *(int*)pItem);
     return 0;
 }

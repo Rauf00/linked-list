@@ -23,9 +23,9 @@ enum ListOutOfBounds {
 };
 typedef struct List_s List;
 struct List_s{
-    Node* headNext;
+    Node* head;
     Node* currentNode;
-    Node* pTail;
+    Node* tail;
     int len;
 };
 
