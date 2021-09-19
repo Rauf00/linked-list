@@ -15,7 +15,6 @@ struct Node_s {
     void* nodeVal;
     Node* nextNode;
     Node* prevNode;
-    int isUsed;
 };
 
 enum ListOutOfBounds {
@@ -24,10 +23,10 @@ enum ListOutOfBounds {
 };
 typedef struct List_s List;
 struct List_s{
-    Node* headerNext;
+    Node* headNext;
     Node* currentNode;
+    Node* pTail;
     int len;
-    int isUsed;
 };
 
 // Maximum number of unique lists the system can support

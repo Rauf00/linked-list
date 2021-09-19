@@ -4,25 +4,27 @@
 
 Node nodeList[LIST_MAX_NUM_NODES];
 List headerList[LIST_MAX_NUM_HEADS];
-int currNodeListIndex = 0;
-int currHeaderListIndex = 0;
+Node* pNodeList = nodeList;
+List* pHeaderList = headerList;
 
 static Node* createNode(Node* nextNode, Node* prevNode, void* nodeVal){
-    nodeList[currNodeListIndex].nextNode = nextNode;
-    nodeList[currNodeListIndex].prevNode = prevNode;
-    nodeList[currNodeListIndex].nodeVal = nodeVal;
-    Node* newNode = &nodeList[currNodeListIndex];
-    currNodeListIndex++;
+    pNodeList->nextNode = nextNode;
+    pNodeList->prevNode = prevNode;
+    pNodeList->nodeVal = nodeVal;
+
+    Node* newNode = pNodeList;
+    pNodeList++;
     return newNode;
 }
 
 List* List_create(){
-    headerList[currHeaderListIndex].headerNext = NULL;
-    headerList[currHeaderListIndex].len = 0;
-    headerList[currHeaderListIndex].isUsed = 1;
-    headerList[currHeaderListIndex].currentNode = NULL;
-    List* newListPointer = &headerList[currHeaderListIndex];
-    currHeaderListIndex += 1;
+    // initialize header
+    pHeaderList->headNext = NULL;
+    pHeaderList->len = 0;
+    pHeaderList->currentNode = NULL;
+
+    List* newListPointer = pHeaderList;
+    pHeaderList += 1;
     return newListPointer;
 }
 
@@ -31,7 +33,10 @@ int List_count(List* pList){
 }
 
 void* List_first(List* pList){
-    pList->currentNode = pList->headerNext;
+    if (pList->len == 0) {
+        return NULL;
+    }
+    pList->currentNode = pList->headNext;
     return pList->currentNode;
 }
 
@@ -39,62 +44,48 @@ void* List_last(List* pList){
     if (pList->len == 0) {
         return NULL;
     }
-    while (pList->currentNode->nextNode != NULL) {
-        pList->currentNode = pList->currentNode->nextNode;
-    }
+    pList->currentNode = pList->pTail->prevNode;
     return pList->currentNode;
 }
 
-void* List_next(List* pList){
-
+void* List_next(List* pList) {
+    if (pList->currentNode->nextNode->nodeVal == NULL){
+        return NULL;
+    }
+    pList->currentNode = pList->currentNode->nextNode;
+    return pList->currentNode;
 }
 
 void* List_prev(List* pList){
-
+    // if (pList->currentNode->prevNode->nodeVal == NULL){
+    //     return NULL;
+    // }
+    pList->currentNode = pList->currentNode->prevNode;
+    return pList->currentNode;
 }
 
 void* List_curr(List* pList){
-
+    return pList->currentNode;
 }
 
-int List_insert_after(List* pList, void* pItem){
-    
-}
-int List_insert_before(List* pList, void* pItem){
-
-}
 int List_append(List* pList, void* pItem){
     Node* newNode;
     if (pList->len == 0) {
-        newNode = createNode(NULL, NULL, pItem); // dont point to head for now
-        pList->headerNext = newNode;
-        
-    } else{
-        Node* lastNode = List_last(pList);
-        newNode = createNode(NULL, lastNode, pItem);
+        newNode = createNode(NULL, NULL, pItem);
+        pList->headNext = newNode;
+
+        // initialize tail
+        Node* tail = createNode(NULL, newNode, NULL);
+        newNode->nextNode = tail;
+        pList->pTail = tail;
+    } else {
+        Node* lastNode = pList->pTail->prevNode;
+        newNode = createNode(pList->pTail, lastNode, pItem);
         lastNode->nextNode = newNode;
+        pList->pTail->prevNode = newNode;
     }
-    pList->len += 1;
     pList->currentNode = newNode;
+    pList->len++;
     printf("Added %d to the list\n", *(int*)pItem);
-    return 1;
-}
-
-int List_prepend(List* pList, void* pItem){
-
-}
-void* List_remove(List* pList){
-
-}
-void* List_trim(List* pList){
-
-}
-void List_concat(List* pList1, List* pList2){
-
-}
-void List_free(List* pList, FREE_FN pItemFreeFn){
-
-}
-void* List_search(List* pList, COMPARATOR_FN pComparator, void* pComparisonArg){
-
+    return 0;
 }
