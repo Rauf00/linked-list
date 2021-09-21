@@ -19,14 +19,16 @@ struct Node_s {
 
 enum ListOutOfBounds {
     LIST_OOB_START,
-    LIST_OOB_END
+    LIST_OOB_END,
 };
 typedef struct List_s List;
 struct List_s{
     Node* head;
     Node* currentNode;
+    int currentPointerState;
     Node* tail;
     int len;
+    List* nextFreeHead;
 };
 
 // Maximum number of unique lists the system can support
