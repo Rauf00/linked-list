@@ -23,6 +23,11 @@ static void printCurrent(List *pList) {
     }
 }
 
+static void deleteNode(void* item) {
+    printf("delete item\n");
+    item = NULL;
+}
+
 int main() {
     // List* testList = List_create();
 
@@ -110,13 +115,13 @@ int main() {
     // // printList(testList2);
     // // printCurrent(testList2);
 
-    List* test = List_create();
-    int array[80];
-    int* pArray[80];
-    for(int i = 0; i < 80; i++) {
+    List* test1 = List_create();
+    int array[100];
+    int* pArray[100];
+    for(int i = 0; i < 100; i++) {
        array[i] = i;
     }
-    for(int i = 0; i < 80; i++) {
+    for(int i = 0; i < 100; i++) {
        pArray[i] = &array[i];
     }
 
@@ -130,21 +135,47 @@ int main() {
        pArray2[i] = &array2[i];
     }
 
-    for(int j = 0; j < 80; j++) {
-        List_append(test, pArray[j]);
+    for(int j = 0; j < 81; j++) {
+        List_append(test1, pArray[j]);
     }
 
     for(int j = 0; j < 20; j++) {
         List_append(test2, pArray2[j]);
     }
-    printList(test);
+    printList(test1);
+    // printCurrent(test);
     printList(test2);   
-    List_first(test2);
-    List_next(test2);
+    // List_last(test2);
+    // printCurrent(test2);
 
+    // List_next(test2);
+    // printCurrent(test2);
+    // List_next(test2);
+    // printCurrent(test2);
+    // List_prev(test2);
+    // printCurrent(test2);
 
-    printf("Removed %d\n", *(int*)(List_remove(test2)));
-    printList(test2);  
+    List* test3 = List_create();
+    List* test4 = List_create();
+    List* test5 = List_create();
+    List* test6 = List_create();
+    List* test7 = List_create();
+    List* test8 = List_create();
+    List* test9 = List_create();
+    List* test10 = List_create();
+    List_concat(test1, test2);
+    printList(test1);
+    // List_free(test1, deleteNode);
+    List* test11 = List_create();
+    // List* test12 = List_create();
+    
+    
+    // printList(test1);
+    // List* test12 = List_create();
+    // List* test13 = List_create();
+    // List_append(test12, pArray[0]);
+    // printList(test12);
+    
     return 0;
 }
 
