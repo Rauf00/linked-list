@@ -87,7 +87,7 @@ void* List_first(List* pList){
         return NULL;
     }
     pList->currentNode = pList->head;
-    return pList->currentNode;
+    return pList->currentNode->nodeVal;
 }
 
 void* List_last(List* pList){
@@ -95,53 +95,62 @@ void* List_last(List* pList){
         return NULL;
     }
     pList->currentNode = pList->tail;
-    return pList->currentNode;
+    return pList->currentNode->nodeVal;
 }
 
 void* List_next(List* pList) {
-    // if OOB at the end, return NULL
-    if (pList->currentPointerState == 1) {
-        return NULL;
-    }
-    // if currentPointer is OOB at the start, move pointer to head
-    if (pList->currentPointerState == 0) {
-        pList->currentNode = pList->head;
-        pList->currentPointerState = 2;
-        return pList->currentNode;
+    // of OOB
+    if (pList->currentNode == NULL) {
+        // if currentPointer is OOB at the end, return NULL
+        if (pList->currentPointerState == 1) {
+            return NULL;
+        }
+        // if currentPointer is OOB at the start, move pointer to head
+        if (pList->currentPointerState == 0) { //check if it's null
+            pList->currentNode = pList->head;
+            pList->currentPointerState = 2;
+            return pList->currentNode->nodeVal;
+        }
     }
     if (pList->currentNode->nextNode == NULL){
         pList->currentPointerState = LIST_OOB_END;
-        printf("Out of bounds status: %d\n", pList->currentPointerState);
+        printf("\nOut of bounds status: %d", pList->currentPointerState);
         pList->currentNode = pList->currentNode->nextNode;
         return NULL;
     }
     pList->currentNode = pList->currentNode->nextNode;
-    return pList->currentNode;
+    return pList->currentNode->nodeVal;
 }
 
 void* List_prev(List* pList){
-    // if OOB at the start, return NULL
-    if (pList->currentPointerState == 0) {
-        return NULL;
-    }
-    // if currentPointer is OOB at the end, move pointer to tail
-    if (pList->currentPointerState == 1) {
-        pList->currentNode = pList->tail;
-        pList->currentPointerState = 2; // set status to something else (not OOB)
-        return pList->currentNode;
+    // if OOB
+    if (pList->currentNode == NULL) {
+        // if OOB at the start, return NULL
+        if (pList->currentPointerState == 0) {
+            return NULL;
+        }
+        // if currentPointer is OOB at the end, move pointer to tail
+        if (pList->currentPointerState == 1) {
+            pList->currentNode = pList->tail;
+            pList->currentPointerState = 2; // set status to something else (not OOB)
+            return pList->currentNode->nodeVal;
+        }
     }
     if (pList->currentNode->prevNode == NULL){
         pList->currentPointerState = LIST_OOB_START;
-        printf("Out of bounds status: %d\n", pList->currentPointerState);
+        printf("\nOut of bounds status: %d", pList->currentPointerState);
         pList->currentNode = pList->currentNode->prevNode;
         return NULL;
     }
     pList->currentNode = pList->currentNode->prevNode;
-    return pList->currentNode;
+    return pList->currentNode->nodeVal;
 }
 
 void* List_curr(List* pList){
-    return pList->currentNode;
+    if (pList->currentNode == NULL) {
+        return NULL;
+    }
+    return pList->currentNode->nodeVal;
 }
 
 int List_append(List* pList, void* pItem){
@@ -158,6 +167,44 @@ int List_append(List* pList, void* pItem){
     }
     pList->currentNode = newNode;
     pList->len++;
+    return 0;
+}
+
+int List_prepend(List* pList, void* pItem){
+    Node* newNode;
+    if (pList->len == 0) {
+        newNode = createNode(NULL, NULL, pItem);
+        pList->head = newNode;
+        pList->tail = newNode;
+    } else {
+        newNode = createNode(pList->head, NULL, pItem);
+        pList->head->prevNode = newNode;
+        pList->head = newNode;
+    }
+    pList->currentNode = newNode;
+    pList->len++;
+    return 0;
+}
+
+int List_insert_after(List* pList, void* pItem) {
+    // OOB
+    if (pList->currentNode == NULL) {
+        // OOB at the start
+        if (pList->currentPointerState == 0) {
+            List_prepend(pList, pItem);
+            return 0;
+        } 
+        // OOB at the end
+        else if (pList->currentPointerState == 1) {
+            List_append(pList, pItem);
+            return 0;
+        }
+    }
+    Node* currentNext = pList->currentNode->nextNode;
+    Node* newNode = createNode(currentNext, pList->currentNode, pItem);
+    pList->currentNode->nextNode = newNode;
+    currentNext->prevNode = newNode;
+    pList->currentNode = newNode;
     return 0;
 }
 
@@ -189,16 +236,18 @@ static void* List_trimFront(List* pList) {
 }
 
 void* List_remove(List* pList) {
-    if (pList->currentPointerState == 0 || pList->currentPointerState == 1) {
+    // if OOB
+    if (pList->currentNode == NULL && (pList->currentPointerState == 0 || pList->currentPointerState == 1)) {
         return NULL;
     }
     void* oldCurrentValue = pList->currentNode->nodeVal;
-    // if currentPointer is a header
+    // if currentPointer is a tail
     if (pList->currentNode == pList->tail) {
+        
         void* pVal = List_trim(pList);
         return pVal;
     } 
-    // if currentPointer is a tail
+    // if currentPointer is a head
     else if (pList->currentNode == pList->head) {
         void* pVal = List_trimFront(pList);
         return pVal;

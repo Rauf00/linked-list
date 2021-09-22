@@ -29,152 +29,196 @@ static void deleteNode(void* item) {
 }
 
 int main() {
-    // List* testList = List_create();
-
-    // // initilize test items;
-    // int testInt1 = 10123;
-    // int* pInt1 = &testInt1;
-    // int testInt2 = 123;
-    // int* pInt2 = &testInt2;
-    // int testInt3 = 1000;
-    // int* pInt3 = &testInt3;
-
-    // // Test List_append
-    // printf("List_append: %d\n", List_append(testList, pInt1));
-    // printf("List_append: %d\n", List_append(testList, pInt2));
-    // printf("List_append: %d\n", List_append(testList, pInt3));
-    // printList(testList);
-    // printCurrent(testList);
-
-    // // Test List_last
-    // Node* lastNode = List_last(testList);
-    // printf("\nList_last test:  %d\n", *(int*)(lastNode->nodeVal));
-    // printList(testList);
-    // printCurrent(testList);
-
-    // // Test List_first
-    // Node* firstNode = List_first(testList);
-    // printf("\nList_first test: %d\n", *(int*)(firstNode->nodeVal));
-    // printList(testList);
-    // printCurrent(testList);
-
-    // // Test List_count
-    // printf("\nList_count test %d\n", List_count(testList));
-    
-    // // Test List_next
-    // Node* next = List_next(testList);
-    // printf("\nList_next test: %d\n", *(int*)(next->nodeVal));
-    // printList(testList);
-    // printCurrent(testList);
-    // next = List_next(testList);
-    // printf("List_next test: %d\n", *(int*)(next->nodeVal));
-    // next = List_next(testList);
-    // printf("List_next test (out of bounds): %p\n", next);
-    // printList(testList);
-    // printCurrent(testList);
-
-    // // Test List_prev
-    // Node* prev = List_prev(testList);
-    // printf("\nList_prev test: %d\n", *(int*)(prev->nodeVal));
-    // printList(testList);
-    // printCurrent(testList);
-    // prev = List_prev(testList);
-    // printf("List_prev test: %d\n", *(int*)(prev->nodeVal));
-    // prev = List_prev(testList);
-    // printf("List_prev test: %d\n", *(int*)(prev->nodeVal));
-    // prev = List_prev(testList);
-    // printf("List_prev test (out of bounds): %p\n", prev);
-    
-    // next = List_next(testList);
-    // printf("List_next test: %d\n", *(int*)(next->nodeVal));
-    // printCurrent(testList);
-    // next = List_next(testList);
-    // printf("List_next test: %d\n", *(int*)(next->nodeVal));
-    // printCurrent(testList);
-
-    // List_remove(testList);
-    // List_trim(testList);
-    // printList(testList);
-    // printCurrent(testList);
-
-
-    // // List* testList2 = List_create();
-
-    // // // initilize test items;
-    // // int test2Int1 = 1;
-    // // int* p2Int1 = &test2Int1;
-    // // int test2Int2 = 2;
-    // // int* p2Int2 = &test2Int2;
-    // // int test2Int3 = 3;
-    // // int* p2Int3 = &test2Int3;
-
-    // // // Test List_append
-    // // printf("List_append: %d\n", List_append(testList2, p2Int1));
-    // // printf("List_append: %d\n", List_append(testList2, p2Int2));
-    // // printf("List_append: %d\n", List_append(testList2, p2Int3));
-    // // printList(testList2);
-    // // printCurrent(testList2);
-
-    List* test1 = List_create();
-    int array[100];
-    int* pArray[100];
-    for(int i = 0; i < 100; i++) {
-       array[i] = i;
+    // create test items
+    int numbers[150];
+    int* pNumbers[100];
+    for(int i = 0; i < 150; i++) {
+       numbers[i] = i;
     }
     for(int i = 0; i < 100; i++) {
-       pArray[i] = &array[i];
+       pNumbers[i] = &numbers[i];
     }
 
-    List* test2 = List_create();
-    int array2[20];
-    int* pArray2[20];
-    for(int i = 0; i < 20; i++) {
-       array2[i] = i;
+    List* list1 = List_create();
+    
+    // Test List_append
+    if(List_append(list1, pNumbers[99]) == 0) {
+        if (*(int*)(List_curr(list1)) == 99){
+            printList(list1);
+            printCurrent(list1);
+            printf("\nList_append test: --- PASSED ---\n");
+        } else {
+            printf("\nERROR: current pointer is wrong\n");
+        }
+    } else {
+        printf("\nERROR: Unable to append an item to the list\n");
     }
-    for(int i = 0; i < 20; i++) {
-       pArray2[i] = &array2[i];
+    
+    // Add more items to the list for further testing
+    printf("\nAdded more items for further testing");
+    for(int i = 0; i < 99; i++) {
+        List_append(list1, pNumbers[i]);
+    }
+    printList(list1);
+
+    // Test List_count
+    if (List_count(list1) == 100) {
+        printf("\nList_count test: --- PASSED ---\n");
+    } else {
+        printf("\nList_count test: --- FAILED ---\n");
     }
 
-    for(int j = 0; j < 81; j++) {
-        List_append(test1, pArray[j]);
+    // Test List_first
+    if (*(int*)(List_first(list1)) == 99) {
+        if (*(int*)(List_curr(list1)) == 99) {
+            printf("\nList_first test: --- PASSED ---\n");
+        } else {
+            printf("\nERROR: current pointer is wrong\n");
+        }
+    } else {
+        printf("\nList_first test: --- FAILED ---\n");
     }
 
-    for(int j = 0; j < 20; j++) {
-        List_append(test2, pArray2[j]);
+    // Test List_last
+    if (*(int*)(List_last(list1)) == 98) {
+        if (*(int*)(List_curr(list1)) == 98) {
+            printf("\nList_last test: --- PASSED ---\n");
+        } else {
+            printf("\nERROR: current pointer is wrong\n");
+        }
+    } else {
+        printf("\nList_last test: --- FAILED ---\n");
     }
-    printList(test1);
-    // printCurrent(test);
-    printList(test2);   
-    // List_last(test2);
-    // printCurrent(test2);
 
-    // List_next(test2);
-    // printCurrent(test2);
-    // List_next(test2);
-    // printCurrent(test2);
-    // List_prev(test2);
-    // printCurrent(test2);
+    // Test List_prev
+    if (*(int*)(List_prev(list1)) == 97) {
+        if (*(int*)(List_curr(list1)) == 97) {
+            printf("\nList_prev test: --- PASSED ---\n");
+        } else {
+            printf("\nERROR: current pointer is wrong\n");
+        }
+    } else {
+        printf("\nList_prev test: --- FAILED ---\n");
+    }
 
-    List* test3 = List_create();
-    List* test4 = List_create();
-    List* test5 = List_create();
-    List* test6 = List_create();
-    List* test7 = List_create();
-    List* test8 = List_create();
-    List* test9 = List_create();
-    List* test10 = List_create();
-    List_concat(test1, test2);
-    printList(test1);
-    // List_free(test1, deleteNode);
-    List* test11 = List_create();
-    // List* test12 = List_create();
+     // Test List_next
+    if (*(int*)(List_next(list1)) == 98) {
+        if (*(int*)(List_curr(list1)) == 98) {
+            printf("\nList_next test: --- PASSED ---\n");
+        } else {
+            printf("\nERROR: current pointer is wrong\n");
+        }
+    } else {
+        printf("\nList_next test: --- FAILED ---\n");
+    }
+
+    // Test List_next OOB
+    if (List_next(list1) == NULL) {
+        if (List_curr(list1) == NULL) {
+            printf("\nList_next OOB test: --- PASSED ---\n");
+        } else {
+            printf("\nERROR: current pointer is wrong\n");
+        }
+    } else {
+        printf("\nList_next OOB test: --- FAILED ---\n");
+    }
+    
+    // Test List_prev when OOB at the end
+    if (*(int*)(List_prev(list1)) == 98) {
+        if (*(int*)(List_curr(list1)) == 98) {
+            printf("\nList_prev after OOB at the end: --- PASSED ---\n");
+        } else {
+            printf("\nERROR: current pointer is wrong\n");
+        }
+    } else {
+        printf("\nList_prev after OOB at the end: --- FAILED ---\n");
+    }
+
+    List_first(list1);
+
+    // Test List_prev OOB
+    if (List_prev(list1) == NULL) {
+        if (List_curr(list1) == NULL) {
+            printf("\nList_prev OOB test: --- PASSED ---\n");
+        } else {
+            printf("\nERROR: current pointer is wrong\n");
+        }
+    } else {
+        printf("\nList_prev OOB test: --- FAILED ---\n");
+    }
+
+    // Test List_next when OOB at the start
+    if (*(int*)(List_next(list1)) == 99) {
+        if (*(int*)(List_curr(list1)) == 99) {
+            printf("\nList_next after OOB at the start: --- PASSED ---\n");
+        } else {
+            printf("\nERROR: current pointer is wrong\n");
+        }
+    } else {
+        printf("\nList_next after OOB at the start: --- FAILED ---\n");
+    }
+
+    // Test List_curr 
+    if (*(int*)(List_curr(list1)) == 99) {
+        printf("\nList_curr test: --- PASSED ---\n");
+    } else {
+        printf("\nList_curr test --- FAILED ---\n");
+    }
+
+    // Test List_prepend
+    List_remove(list1);
+    if (List_prepend(list1, pNumbers[98]) == 0) {
+        if (*(int*)(List_curr(list1)) == 98) {
+            printf("\nList_prepend test: --- PASSED ---\n");
+            List_remove(list1);
+        } else {
+            printf("\nERROR: current pointer is wrong\n");
+        }
+    } else {
+        printf("\nList_prepend test --- FAILED ---\n");
+    }
+
+    // Test List_insert_after
+    if (List_insert_after(list1, pNumbers[97]) == 0) {
+        if (*(int*)(List_curr(list1)) == 97) {
+            printf("\nList_insert_after test: --- PASSED ---\n");
+            List_remove(list1);
+        } else {
+            printf("\nERROR: current pointer is wrong\n");
+        }
+    } else {
+        printf("\nList_insert_after test: --- FAILED ---\n");
+    }
+
+    // Test List_insert_after when OOB at the start
+    List_first(list1);
+    List_prev(list1);
+    if (List_insert_after(list1, pNumbers[97]) == 0) {
+        if (*(int*)(List_curr(list1)) == 97) {
+            printf("\nList_insert_after when OOB at the start test: --- PASSED ---\n");
+            List_remove(list1);
+        } else {
+            printf("\nERROR: current pointer is wrong\n");
+        }
+    } else {
+        printf("\nList_insert_after when OOB at the start test: --- FAILED ---\n");
+    }
+
+    // Test List_insert_after when OOB at the end
+    List_last(list1);
+    List_next(list1);
+    if (List_insert_after(list1, pNumbers[97]) == 0) {
+        if (*(int*)(List_curr(list1)) == 97) {
+            printf("\nList_insert_after when OOB at the end test: --- PASSED ---\n");
+            List_remove(list1);
+        } else {
+            printf("\nERROR: current pointer is wrong\n");
+        }
+    } else {
+        printf("\nList_insert_after when OOB at the end test: --- FAILED ---\n");
+    }
     
     
-    // printList(test1);
-    // List* test12 = List_create();
-    // List* test13 = List_create();
-    // List_append(test12, pArray[0]);
-    // printList(test12);
     
     return 0;
 }
