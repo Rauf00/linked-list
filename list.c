@@ -208,6 +208,28 @@ int List_insert_after(List* pList, void* pItem) {
     return 0;
 }
 
+int List_insert_before(List* pList, void* pItem) {
+    // OOB
+    if (pList->currentNode == NULL) {
+        // OOB at the start
+        if (pList->currentPointerState == 0) {
+            List_prepend(pList, pItem);
+            return 0;
+        } 
+        // OOB at the end
+        else if (pList->currentPointerState == 1) {
+            List_append(pList, pItem);
+            return 0;
+        }
+    }
+    Node* currentPrev = pList->currentNode->prevNode;
+    Node* newNode = createNode(pList->currentNode, currentPrev, pItem);
+    pList->currentNode->prevNode = newNode;
+    currentPrev->nextNode = newNode;
+    pList->currentNode = newNode;
+    return 0;
+}
+
 void* List_trim(List* pList) {
     void* oldTail = pList->tail->nodeVal;
     // adjust pointers

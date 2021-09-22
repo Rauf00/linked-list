@@ -218,7 +218,45 @@ int main() {
         printf("\nList_insert_after when OOB at the end test: --- FAILED ---\n");
     }
     
-    
+    // Test List_insert_after
+    if (List_insert_before(list1, pNumbers[97]) == 0) {
+        if (*(int*)(List_curr(list1)) == 97) {
+            printf("\nList_insert_before test: --- PASSED ---\n");
+            List_remove(list1);
+        } else {
+            printf("\nERROR: current pointer is wrong\n");
+        }
+    } else {
+        printf("\nList_insert_before test: --- FAILED ---\n");
+    }
+
+    // Test List_insert_before when OOB at the end
+    List_last(list1);
+    List_next(list1);
+    if (List_insert_before(list1, pNumbers[97]) == 0) {
+        if (*(int*)(List_curr(list1)) == 97) {
+            printf("\nList_insert_before when OOB at the end test: --- PASSED ---\n");
+            List_remove(list1);
+        } else {
+            printf("\nERROR: current pointer is wrong\n");
+        }
+    } else {
+        printf("\nList_insert_before when OOB at the end test: --- FAILED ---\n");
+    }
+
+    // Test List_insert_before when OOB at the end
+    List_last(list1);
+    List_next(list1);
+    if (List_insert_before(list1, pNumbers[97]) == 0) {
+        if (*(int*)(List_curr(list1)) == 97) {
+            printf("\nList_insert_before when OOB at the end test: --- PASSED ---\n");
+            List_remove(list1);
+        } else {
+            printf("\nERROR: current pointer is wrong\n");
+        }
+    } else {
+        printf("\nList_insert_before when OOB at the end test: --- FAILED ---\n");
+    }
     
     return 0;
 }
