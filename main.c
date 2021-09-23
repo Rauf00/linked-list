@@ -23,8 +23,18 @@ static void printCurrent(List *pList) {
     }
 }
 
+// typedef bool (*COMPARATOR_FN)(void* pItem, void* pComparisonArg);
+
+static bool comparator(void* pItem, void* pComparisonArg) {
+    if (*(int*)pItem == *(int*)pComparisonArg) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
 static void deleteNode(void* item) {
-    printf("delete item\n");
+    // printf("delete item\n");
     item = NULL;
 }
 
@@ -258,6 +268,179 @@ int main() {
         printf("\nList_insert_before when OOB at the end test: --- FAILED ---\n");
     }
     
+    List_prev(list1);
+    // List_first(list1);
+    // List_next(list1);
+    // Test List_remove last
+    if (*(int*)List_remove(list1) == 98) {
+        if (List_curr(list1) == NULL) {
+            printf("\nList_remove test: --- PASSED ---\n");
+            List_append(list1, pNumbers[98]);
+        } else {
+            printf("\nERROR: current pointer is wrong\n");
+        }
+    } else {
+        printf("\nList_remove test: --- FAILED ---\n");
+    }
+
+    List_first(list1);
+    // Test List_remove first
+    if (*(int*)List_remove(list1) == 0) {
+        if (*(int*)List_curr(list1) == 1) {
+            printf("\nList_remove first test: --- PASSED ---\n");
+            List_prepend(list1, pNumbers[0]);
+        } else {
+            printf("\nERROR: current pointer is wrong\n");
+        }
+    } else {
+        printf("\nList_remove first test: --- FAILED ---\n");
+    }
+
+    List_next(list1);
+    // Test List_remove middle
+    if (*(int*)List_remove(list1) == 1) {
+        if (*(int*)List_curr(list1) == 2) {
+            printf("\nList_remove middle test: --- PASSED ---\n");
+            List_insert_before(list1, pNumbers[1]);
+        } else {
+            printf("\nERROR: current pointer is wrong\n");
+        }
+    } else {
+        printf("\nList_remove middle test: --- FAILED ---\n");
+    }
+
+    // Test List_remove OOB
+    List_first(list1);
+    List_prev(list1);
+    if (List_remove(list1) == NULL) {
+        if (List_curr(list1) == NULL) {
+            printf("\nList_remove OOB test: --- PASSED ---\n");
+        } else {
+            printf("\nERROR: current pointer is wrong\n");
+        }
+    } else {
+        printf("\nList_remove OOB test: --- FAILED ---\n");
+    }
+
+    // Test List_trim
+    if (*(int*)List_trim(list1) == 98) {
+        if (*(int*)List_curr(list1) == 97) {
+            printf("\nList_trim test: --- PASSED ---\n");
+            List_append(list1, pNumbers[98]);
+        } else {
+            printf("\nERROR: current pointer is wrong\n");
+        }
+    } else {
+        printf("\nList_trim test: --- FAILED ---\n");
+    }
+
+    // Test trim with empty list
+    List* list2 = List_create();
+    if (List_trim(list2) == NULL) {
+        if (List_curr(list2) == NULL) {
+            printf("\nList_trim empty test: --- PASSED ---\n");
+        } else {
+            printf("\nERROR: current pointer is wrong\n");
+        }
+    } else {
+        printf("\nList_trim empty test: --- FAILED ---\n");
+    }
+
+    // Test List_concat
+    List_append(list2, pNumbers[99]);
+    List_concat(list1, list2);
+    List_first(list1);
+    if (List_count(list1) == 100) {
+        if (*(int*)List_curr(list1) == 0) {
+            printf("\nList_concat test: --- PASSED ---\n");
+        } else {
+            printf("\nERROR: current pointer is wrong\n");
+        }
+    } else {
+        printf("\nList_concat test: --- FAILED ---\n");
+    }
+
+    // Test memory management
+
+    // Test insertion when all nodes are used
+    if (List_append(list1, pNumbers[0]) == -1) {
+        printf("List_append test when all node are used: --- PASSED ---\n");
+    } else {
+        return 0;
+    }
+    if (List_prepend(list1, pNumbers[0]) == -1) {
+        printf("List_prepend test when all node are used: --- PASSED ---\n");
+    } else {
+        return 0;
+    }
+    if (List_insert_after(list1, pNumbers[0]) == -1) {
+        printf("List_insert_after test when all node are used: --- PASSED ---\n");
+    } else {
+        return 0;
+    }
+    if (List_insert_before(list1, pNumbers[0]) == -1) {
+        printf("List_insert_before test when all node are used: --- PASSED ---\n");
+    } else {
+        return 0;
+    }
+    
+    // Test that a node is made available after removal
+    List_remove(list1);
+    if (List_append(list1, pNumbers[0]) == 0) {
+        printf("\nList_append after List_remove (when all node were used): --- PASSED ---\n");
+    } else {
+        return 0;
+    }
+
+    // Use all head nodes
+    list2 = List_create();
+    List* list3 = List_create();
+    List* list4 = List_create();
+    List* list5 = List_create();
+    List* list6 = List_create();
+    List* list7 = List_create();
+    List* list8 = List_create();
+    List* list9 = List_create();
+    List* list10 = List_create();
+
+    List* list11 = List_create();
+    if (list11 == NULL) {
+        printf("\nList_create when all heads were used: --- PASSED ---\n");
+    }
+
+    // Test List_free
+    List_free(list1, deleteNode);
+    list11 = List_create();
+    if (list11 != NULL) {
+        printf("\nList_free test: --- PASSED ---\n");
+    }
+
+    // Populate list11 to show that all nodes were reallocated
+    printf("\nNewly created list after List_free");
+    for(int i = 0; i < 99; i++) {
+        List_append(list11, pNumbers[i]);
+    }
+    printList(list11);
+
+    List_first(list11);
+    // Test List_search found
+    if (*(int*)(List_search(list11, comparator, pNumbers[67])) == 67) {
+        if (*(int*)(List_curr(list11)) == 67) {
+            printf("\nList_search test when found: --- PASSED ---\n");
+        }
+    }
+    printList(list11);
+
+    // Test List_search not found
+    if (List_search(list11, comparator, pNumbers[99]) == NULL) {
+        printCurrent(list11);
+        if (List_curr(list11) == NULL) {
+            printf("\nList_search test when not found: --- PASSED ---\n");
+        }
+    }
+
+    List_prev(list11);
+    printCurrent(list11);
     return 0;
 }
 

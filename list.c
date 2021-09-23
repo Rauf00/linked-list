@@ -41,10 +41,6 @@ static void freeHeadList(List* list) {
 
 // helper function to create a node
 static Node* createNode(Node* nextNode, Node* prevNode, void* nodeVal){
-    if (pNodeList == NULL) {
-        printf("ERROR: All nodes are used!\n");
-        return NULL;
-    }
     Node* newNode = pNodeList;
     pNodeList = pNodeList->nextNode;
     
@@ -53,6 +49,16 @@ static Node* createNode(Node* nextNode, Node* prevNode, void* nodeVal){
     newNode->prevNode = prevNode;
     newNode->nodeVal = nodeVal;
     return newNode;
+}
+
+static bool isInsertInvalid() {
+    // all nodes are used
+    if (pNodeList == NULL) {
+        printf("\nERROR: All nodes are used!\n");
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 List* List_create(){
@@ -154,6 +160,9 @@ void* List_curr(List* pList){
 }
 
 int List_append(List* pList, void* pItem){
+    if (isInsertInvalid()) {
+        return -1;
+    }
     Node* newNode;
     if (pList->len == 0) {
         newNode = createNode(NULL, NULL, pItem);
@@ -171,6 +180,9 @@ int List_append(List* pList, void* pItem){
 }
 
 int List_prepend(List* pList, void* pItem){
+    if (isInsertInvalid()) {
+        return -1;
+    }
     Node* newNode;
     if (pList->len == 0) {
         newNode = createNode(NULL, NULL, pItem);
@@ -187,6 +199,9 @@ int List_prepend(List* pList, void* pItem){
 }
 
 int List_insert_after(List* pList, void* pItem) {
+    if (isInsertInvalid()) {
+        return -1;
+    }
     // OOB
     if (pList->currentNode == NULL) {
         // OOB at the start
@@ -205,10 +220,14 @@ int List_insert_after(List* pList, void* pItem) {
     pList->currentNode->nextNode = newNode;
     currentNext->prevNode = newNode;
     pList->currentNode = newNode;
+    pList->len++;
     return 0;
 }
 
 int List_insert_before(List* pList, void* pItem) {
+    if (isInsertInvalid()) {
+        return -1;
+    }
     // OOB
     if (pList->currentNode == NULL) {
         // OOB at the start
@@ -227,10 +246,14 @@ int List_insert_before(List* pList, void* pItem) {
     pList->currentNode->prevNode = newNode;
     currentPrev->nextNode = newNode;
     pList->currentNode = newNode;
+    pList->len++;
     return 0;
 }
 
 void* List_trim(List* pList) {
+    if (pList->len == 0) {
+        return NULL;
+    }
     void* oldTail = pList->tail->nodeVal;
     // adjust pointers
     Node* tailPrev = pList->tail->prevNode;
@@ -240,21 +263,8 @@ void* List_trim(List* pList) {
 
     pList->tail = tailPrev;
     pList->currentNode = pList->tail;
+    pList->len--;
     return oldTail;
-}
-
-static void* List_trimFront(List* pList) {
-    void* oldHead = pList->head->nodeVal;
-    // adjust pointers
-    Node* headNext = pList->head->nextNode;
-    headNext->prevNode = NULL;
-
-    freeNode(pList->head);
-
-    pList->head = headNext;
-    pList->currentNode = pList->head;
-
-    return oldHead;
 }
 
 void* List_remove(List* pList) {
@@ -262,17 +272,28 @@ void* List_remove(List* pList) {
     if (pList->currentNode == NULL && (pList->currentPointerState == 0 || pList->currentPointerState == 1)) {
         return NULL;
     }
-    void* oldCurrentValue = pList->currentNode->nodeVal;
+    void* oldCurrentVal = pList->currentNode->nodeVal;
     // if currentPointer is a tail
     if (pList->currentNode == pList->tail) {
-        
-        void* pVal = List_trim(pList);
-        return pVal;
+        // adjust pointers
+        Node* tailPrev = pList->tail->prevNode;
+        tailPrev->nextNode = NULL;
+
+        freeNode(pList->tail);
+
+        pList->tail = tailPrev;
+        pList->currentNode = pList->tail->nextNode;
     } 
     // if currentPointer is a head
     else if (pList->currentNode == pList->head) {
-        void* pVal = List_trimFront(pList);
-        return pVal;
+        // adjust pointers
+        Node* headNext = pList->head->nextNode;
+        headNext->prevNode = NULL;
+
+        freeNode(pList->head);
+
+        pList->head = headNext;
+        pList->currentNode = pList->head;
     } 
     // if currentPointer is between two nodes
     else {
@@ -285,15 +306,17 @@ void* List_remove(List* pList) {
         freeNode(pList->currentNode);
 
         // update current node
-        pList->currentNode = currNext;
-        return oldCurrentValue;
+        pList->currentNode = currNext;   
     }
+    pList->len--;
+    return oldCurrentVal;
 }
 
 void List_concat(List* pList1, List* pList2) {
     pList1->tail->nextNode = pList2->head;
     pList2->head->prevNode = pList1->tail;
     pList1->tail = pList2->tail;
+    pList1->len = pList1->len + pList2->len;
     freeHeadList(pList2);
 }
 
@@ -309,5 +332,21 @@ void List_free(List* pList, FREE_FN pItemFreeFn) {
     }
     freeHeadList(pList);
 }
+
+void* List_search(List* pList, COMPARATOR_FN pComparator, void* pComparisonArg){
+    Node* current = pList->currentNode;
+    while (current) {
+        if (pComparator(current->nodeVal, pComparisonArg)) {
+            pList->currentNode = current;
+            return current->nodeVal;
+        }
+        current = current->nextNode;
+    }
+    pList->currentNode = current;
+    pList->currentPointerState = LIST_OOB_END;
+    printf("\nOut of bounds status: %d", pList->currentPointerState);
+    return NULL;
+}
+
 
 
