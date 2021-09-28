@@ -2,13 +2,17 @@
 #include <stdio.h>
 #include "list.h"
 
+// Allocate a list of nodes and heads
 static Node nodeList[LIST_MAX_NUM_NODES];
 static List headList[LIST_MAX_NUM_HEADS];
+// pNodeList is a pointer to a linked list of free nodes
 static Node* pNodeList = nodeList;
+// pHeadList is a pointer to a linked list of free heads
 static List* pHeadList = headList;
 static int isInitialized = 0;
 
-// link all nodes together and all heads together
+// Link all nodes together and all heads together
+// Note: this is the allowed O(n) op on program initialization
 static void initialize(){
     for (int i = 0; i < LIST_MAX_NUM_NODES - 1; i++) {
         nodeList[i].nextNode = &nodeList[i + 1];
@@ -18,29 +22,30 @@ static void initialize(){
     }
 }
 
-// helper function to free a node for the future usage
+// Free a node for the future usage
 static void freeNode(Node* node) {
-    // make removed node free
-    node->nextNode = pNodeList;
     node->prevNode = NULL;
     node->nodeVal = NULL;
-    
+    // Add to the list of free nodes
+    node->nextNode = pNodeList;
     pNodeList = node;
 }
 
+// Free a head for the future use
 static void freeHeadList(List* list) {
-    list->currentPointerState = 2;
+    list->currentPointerState = 2; 
     list->len = 0;
-    list->nextFreeHead = pHeadList;
     list->currentNode = NULL;
     list->head = NULL;
     list->tail = NULL;
-
+    // Add to the list of free heads
+    list->nextFreeHead = pHeadList;
     pHeadList = list;
 }
 
-// helper function to create a node
+// Create a new node
 static Node* createNode(Node* nextNode, Node* prevNode, void* nodeVal){
+    // Take out a node from the list of free nodes
     Node* newNode = pNodeList;
     pNodeList = pNodeList->nextNode;
     
@@ -52,9 +57,8 @@ static Node* createNode(Node* nextNode, Node* prevNode, void* nodeVal){
 }
 
 static bool isInsertInvalid() {
-    // all nodes are used
+    // All nodes are used
     if (pNodeList == NULL) {
-        printf("\nERROR: All nodes are used!\n");
         return 1;
     } else {
         return 0;
@@ -66,10 +70,11 @@ List* List_create(){
         initialize();
         isInitialized = 1;
     }
+    // All heads are used
     if (pHeadList == NULL) {
-        printf("ERROR: All heads are used!\n");
         return NULL;
     }
+    // Take out a head from the list of free heads
     List* newListPointer = pHeadList;
     pHeadList = pHeadList->nextFreeHead;
 
@@ -90,6 +95,7 @@ int List_count(List* pList){
 
 void* List_first(List* pList){
     if (pList->len == 0) {
+        pList->currentNode = NULL;
         return NULL;
     }
     pList->currentNode = pList->head;
@@ -98,6 +104,7 @@ void* List_first(List* pList){
 
 void* List_last(List* pList){
     if (pList->len == 0) {
+        pList->currentNode = NULL;
         return NULL;
     }
     pList->currentNode = pList->tail;
@@ -120,7 +127,6 @@ void* List_next(List* pList) {
     }
     if (pList->currentNode->nextNode == NULL){
         pList->currentPointerState = LIST_OOB_END;
-        printf("\nOut of bounds status: %d", pList->currentPointerState);
         pList->currentNode = pList->currentNode->nextNode;
         return NULL;
     }
@@ -144,7 +150,6 @@ void* List_prev(List* pList){
     }
     if (pList->currentNode->prevNode == NULL){
         pList->currentPointerState = LIST_OOB_START;
-        printf("\nOut of bounds status: %d", pList->currentPointerState);
         pList->currentNode = pList->currentNode->prevNode;
         return NULL;
     }
@@ -268,10 +273,6 @@ void* List_trim(List* pList) {
 }
 
 void* List_remove(List* pList) {
-    if (pList->len == 2) {
-printf("item: %d\n", *(int*)(pList->currentNode));
-    }
-    
     // if OOB
     if (pList->currentNode == NULL && (pList->currentPointerState == 0 || pList->currentPointerState == 1)) {
         return NULL;
@@ -287,6 +288,8 @@ printf("item: %d\n", *(int*)(pList->currentNode));
 
         pList->tail = tailPrev;
         pList->currentNode = pList->tail->nextNode;
+        // if we remove tail, current is set to the next (which is null) and hence it's OOB_END
+        pList->currentPointerState = 1;
     } 
     // if currentPointer is a head
     else if (pList->currentNode == pList->head) {
@@ -341,6 +344,9 @@ void List_free(List* pList, FREE_FN pItemFreeFn) {
 
 void* List_search(List* pList, COMPARATOR_FN pComparator, void* pComparisonArg){
     Node* current = pList->currentNode;
+    if (current == NULL && pList->currentPointerState == 0){
+        current = pList->head;
+    }
     while (current) {
         if (pComparator(current->nodeVal, pComparisonArg)) {
             pList->currentNode = current;
@@ -350,7 +356,6 @@ void* List_search(List* pList, COMPARATOR_FN pComparator, void* pComparisonArg){
     }
     pList->currentNode = current;
     pList->currentPointerState = LIST_OOB_END;
-    printf("\nOut of bounds status: %d", pList->currentPointerState);
     return NULL;
 }
 
