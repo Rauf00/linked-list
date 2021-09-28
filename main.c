@@ -26,7 +26,7 @@ static void printCurrent(List *pList) {
 // typedef bool (*COMPARATOR_FN)(void* pItem, void* pComparisonArg);
 
 static bool comparator(void* pItem, void* pComparisonArg) {
-    if (*(int*)pItem == *(int*)pComparisonArg) {
+    if (pItem == pComparisonArg) {
         return 1;
     } else {
         return 0;
@@ -407,7 +407,9 @@ int main() {
     if (list11 == NULL) {
         printf("\nList_create when all heads were used: --- PASSED ---\n");
     }
-
+    List_first(list1);
+    printCurrent(list1);
+    printList(list1);
     // Test List_free
     List_free(list1, deleteNode);
     list11 = List_create();
@@ -415,32 +417,32 @@ int main() {
         printf("\nList_free test: --- PASSED ---\n");
     }
 
-    // Populate list11 to show that all nodes were reallocated
-    printf("\nNewly created list after List_free");
-    for(int i = 0; i < 99; i++) {
-        List_append(list11, pNumbers[i]);
-    }
-    printList(list11);
+    // // Populate list11 to show that all nodes were reallocated
+    // printf("\nNewly created list after List_free");
+    // for(int i = 0; i < 99; i++) {
+    //     List_append(list11, pNumbers[i]);
+    // }
+    // printList(list11);
 
-    List_first(list11);
-    // Test List_search found
-    if (*(int*)(List_search(list11, comparator, pNumbers[67])) == 67) {
-        if (*(int*)(List_curr(list11)) == 67) {
-            printf("\nList_search test when found: --- PASSED ---\n");
-        }
-    }
-    printList(list11);
+    // List_first(list11);
+    // // Test List_search found
+    // if (*(int*)(List_search(list11, comparator, pNumbers[67])) == 67) {
+    //     if (*(int*)(List_curr(list11)) == 67) {
+    //         printf("\nList_search test when found: --- PASSED ---\n");
+    //     }
+    // }
+    // printList(list11);
 
-    // Test List_search not found
-    if (List_search(list11, comparator, pNumbers[99]) == NULL) {
-        printCurrent(list11);
-        if (List_curr(list11) == NULL) {
-            printf("\nList_search test when not found: --- PASSED ---\n");
-        }
-    }
+    // // Test List_search not found
+    // if (List_search(list11, comparator, pNumbers[99]) == NULL) {
+    //     printCurrent(list11);
+    //     if (List_curr(list11) == NULL) {
+    //         printf("\nList_search test when not found: --- PASSED ---\n");
+    //     }
+    // }
 
-    List_prev(list11);
-    printCurrent(list11);
+    // List_prev(list11);
+    // printCurrent(list11);
     return 0;
 }
 

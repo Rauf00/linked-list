@@ -268,6 +268,10 @@ void* List_trim(List* pList) {
 }
 
 void* List_remove(List* pList) {
+    if (pList->len == 2) {
+printf("item: %d\n", *(int*)(pList->currentNode));
+    }
+    
     // if OOB
     if (pList->currentNode == NULL && (pList->currentPointerState == 0 || pList->currentPointerState == 1)) {
         return NULL;
@@ -324,10 +328,12 @@ void List_free(List* pList, FREE_FN pItemFreeFn) {
     Node* current = pList->head;
     while(current) {
         Node* currentNext = current->nextNode;
-        (*pItemFreeFn)(current->nodeVal);
+        // remove current node from the list and make it available
         current->nextNode = pNodeList;
         current->prevNode = NULL;
+        (*pItemFreeFn)(current->nodeVal);
         pNodeList = current;
+
         current = currentNext;
     }
     freeHeadList(pList);
