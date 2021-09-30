@@ -404,7 +404,7 @@ int main() {
     List_free(list11, deleteNode);
 
     printf("-----------------------------------------------------------------\n");
-    printf("All 41 test cases are passed! \nRauf KRASAVCHIK, MASHINA, MONSTR!!!\n");
+    printf("All 41 test cases are passed!\n");
     return 0;
 }
 
