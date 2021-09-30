@@ -31,7 +31,7 @@ static bool comparator(void* pItem, void* pComparisonArg) {
 }
 
 static void deleteNode(void* item) {
-    item = NULL;
+    // item = NULL;
 }
 
 int main() {

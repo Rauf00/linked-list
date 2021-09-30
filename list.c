@@ -277,6 +277,15 @@ void* List_remove(List* pList) {
     if (pList->currentNode == NULL && (pList->currentPointerState == 0 || pList->currentPointerState == 1)) {
         return NULL;
     }
+    // if only one item left
+    if (pList->tail == pList->head) {
+        freeNode(pList->tail);
+        pList->head = NULL;
+        pList->tail = NULL;
+        pList->len--;
+        pList->currentPointerState = 2;
+        return NULL;
+    }
     void* oldCurrentVal = pList->currentNode->nodeVal;
     // if currentPointer is a tail
     if (pList->currentNode == pList->tail) {
@@ -329,15 +338,10 @@ void List_concat(List* pList1, List* pList2) {
 
 void List_free(List* pList, FREE_FN pItemFreeFn) {
     Node* current = pList->head;
-    while(current) {
-        Node* currentNext = current->nextNode;
-        // remove current node from the list and make it available
-        current->nextNode = pNodeList;
-        current->prevNode = NULL;
+    List_first(pList);
+    while(pList->len != 0) {
         (*pItemFreeFn)(current->nodeVal);
-        pNodeList = current;
-
-        current = currentNext;
+        List_remove(pList);
     }
     freeHeadList(pList);
 }
