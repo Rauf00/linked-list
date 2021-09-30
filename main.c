@@ -31,6 +31,9 @@ static bool comparator(void* pItem, void* pComparisonArg) {
 }
 
 static void deleteNode(void* item) {
+    // According to post #202 on discussion forum, 
+    // since current test program uses statically allocated array, I left this function empty.
+    // Please, see main function to see how List_free is properly tested
     // item = NULL;
 }
 
